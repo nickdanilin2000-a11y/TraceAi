@@ -9,6 +9,7 @@ from auth import router as auth_router
 from routes.chat import router as chat_router
 from routes.documents import router as documents_router
 from routes.audit import router as audit_router
+from routes.admin import router as admin_router
 
 # Создаём все таблицы в базе данных
 Base.metadata.create_all(bind=engine)
@@ -34,6 +35,7 @@ app.include_router(auth_router)
 app.include_router(chat_router)
 app.include_router(documents_router)
 app.include_router(audit_router)
+app.include_router(admin_router)
 
 # Главная страница
 @app.get("/")
