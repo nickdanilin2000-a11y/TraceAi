@@ -11,7 +11,7 @@ export default function AuditPage() {
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (!token) { router.push('/login'); return }
-    fetch('http://localhost:8000/audit/', {
+    fetch('http://85.193.85.81:8000/audit/', {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     .then(r => r.json())

@@ -28,7 +28,7 @@ export default function ChatPage() {
     setLoading(true)
 
     try {
-      const res = await fetch('http://localhost:8000/chat/', {
+      const res = await fetch('http://85.193.85.81:8000/chat/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ prompt: input, model: 'gigachat' }),

@@ -9,7 +9,7 @@ export default function Dashboard() {
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (!token) { router.push('/login'); return }
-    fetch('http://localhost:8000/auth/me', {
+    fetch('http://85.193.85.81:8000/auth/me', {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     .then(r => r.json())
@@ -82,7 +82,7 @@ export default function Dashboard() {
         <div style={{ background: '#111827', border: '1px solid rgba(33,170,255,0.2)', borderRadius: '12px', padding: '24px' }}>
           <div style={{ color: '#21aaff', fontSize: '13px', fontWeight: '700', marginBottom: '8px' }}>🚀 Система запущена</div>
           <div style={{ color: '#8A94A6', fontSize: '13px', lineHeight: '1.6' }}>
-            Бэкенд работает на localhost:8000<br/>
+            Бэкенд работает на 85.193.85.81:8000<br/>
             База данных PostgreSQL подключена<br/>
             Redis запущен<br/>
             Все модули активны

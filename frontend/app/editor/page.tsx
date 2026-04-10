@@ -23,7 +23,7 @@ export default function EditorPage() {
   }, [router])
 
   const loadDocs = async (t: string) => {
-    const res = await fetch('http://localhost:8000/documents/', {
+    const res = await fetch('http://85.193.85.81:8000/documents/', {
       headers: { 'Authorization': `Bearer ${t}` }
     })
     const data = await res.json()
@@ -31,7 +31,7 @@ export default function EditorPage() {
   }
 
   const selectDoc = async (doc: any) => {
-    const res = await fetch(`http://localhost:8000/documents/${doc.id}`, {
+    const res = await fetch(`http://85.193.85.81:8000/documents/${doc.id}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     const data = await res.json()
@@ -43,7 +43,7 @@ export default function EditorPage() {
   const saveDoc = async () => {
     if (!selectedDoc) return
     setSaving(true)
-    await fetch(`http://localhost:8000/documents/${selectedDoc.id}`, {
+    await fetch(`http://85.193.85.81:8000/documents/${selectedDoc.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ content, title }),
@@ -54,7 +54,7 @@ export default function EditorPage() {
 
   const createDoc = async () => {
     if (!newTitle.trim()) return
-    const res = await fetch('http://localhost:8000/documents/', {
+    const res = await fetch('http://85.193.85.81:8000/documents/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ title: newTitle, content: '' }),
@@ -69,7 +69,7 @@ export default function EditorPage() {
   const askAi = async () => {
     if (!aiPrompt.trim() || !selectedDoc) return
     setAiLoading(true)
-    const res = await fetch(`http://localhost:8000/documents/${selectedDoc.id}/ai-assist`, {
+    const res = await fetch(`http://85.193.85.81:8000/documents/${selectedDoc.id}/ai-assist`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ prompt: aiPrompt }),
@@ -84,7 +84,7 @@ export default function EditorPage() {
 
   const updateStatus = async (status: string) => {
     if (!selectedDoc) return
-    await fetch(`http://localhost:8000/documents/${selectedDoc.id}`, {
+    await fetch(`http://85.193.85.81:8000/documents/${selectedDoc.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       body: JSON.stringify({ status }),

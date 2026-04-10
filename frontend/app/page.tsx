@@ -17,8 +17,8 @@ export default function LoginPage() {
     setError('')
     try {
       const url = isLogin
-        ? 'http://localhost:8000/auth/login'
-        : 'http://localhost:8000/auth/register'
+        ? 'http://85.193.85.81:8000/auth/login'
+        : 'http://85.193.85.81:8000/auth/register'
       const body = isLogin
         ? { email, password }
         : { email, password, name, company_name: company }
