@@ -23,21 +23,27 @@ export default function EditorPage() {
   }, [router])
 
   const loadDocs = async (t: string) => {
-    const res = await fetch('http://85.193.85.81:8000/documents/', {
-      headers: { 'Authorization': `Bearer ${t}` }
-    })
-    const data = await res.json()
-    setDocs(Array.isArray(data) ? data : [])
+    try {
+      const res = await fetch('http://85.193.85.81:8000/documents/', {
+        headers: { 'Authorization': `Bearer ${t}` }
+      })
+      if (!res.ok) { if (res.status === 401) router.push('/login'); return }
+      const data = await res.json()
+      setDocs(Array.isArray(data) ? data : [])
+    } catch { /* network error — keep current list */ }
   }
 
   const selectDoc = async (doc: any) => {
-    const res = await fetch(`http://85.193.85.81:8000/documents/${doc.id}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-    const data = await res.json()
-    setSelectedDoc(data)
-    setContent(data.content || '')
-    setTitle(data.title || '')
+    try {
+      const res = await fetch(`http://85.193.85.81:8000/documents/${doc.id}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      if (!res.ok) return
+      const data = await res.json()
+      setSelectedDoc(data)
+      setContent(data.content || '')
+      setTitle(data.title || '')
+    } catch { /* network error — keep current selection */ }
   }
 
   const saveDoc = async () => {

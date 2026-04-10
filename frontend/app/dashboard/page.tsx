@@ -2,19 +2,34 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+const API = 'http://85.193.85.81:8000'
+
 export default function Dashboard() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
+  const [kpi, setKpi] = useState({ aiRequests: 0, tokens: 0, documents: 0 })
 
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (!token) { router.push('/login'); return }
-    fetch('http://85.193.85.81:8000/auth/me', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-    .then(r => r.json())
-    .then(data => setUser(data))
-    .catch(() => router.push('/login'))
+    const h = { 'Authorization': `Bearer ${token}` }
+
+    Promise.all([
+      fetch(`${API}/auth/me`,     { headers: h }),
+      fetch(`${API}/audit/stats`, { headers: h }),
+      fetch(`${API}/documents/`,  { headers: h }),
+    ]).then(async ([meRes, statsRes, docsRes]) => {
+      if (!meRes.ok) { router.push('/login'); return }
+      const me    = await meRes.json()
+      const stats = statsRes.ok ? await statsRes.json() : null
+      const docs  = docsRes.ok  ? await docsRes.json()  : []
+      setUser(me)
+      setKpi({
+        aiRequests: stats?.total_requests ?? 0,
+        tokens:     stats?.total_tokens   ?? 0,
+        documents:  Array.isArray(docs) ? docs.length : 0,
+      })
+    }).catch(() => router.push('/login'))
   }, [router])
 
   const logout = () => {
@@ -37,16 +52,21 @@ export default function Dashboard() {
           <span style={{ color: '#F0F4FC', fontWeight: '800', fontSize: '15px' }}>TraceAI</span>
         </div>
         {[
-          { label: 'Дашборд', path: '/dashboard', icon: '◈' },
-          { label: 'Редактор', path: '/editor', icon: '✦' },
-          { label: 'AI-чат', path: '/chat', icon: '◎' },
-          { label: 'Аналитика', path: '/analytics', icon: '▦' },
-          { label: 'Audit Trail', path: '/audit', icon: '⊕' },
+          { label: 'Дашборд',    path: '/dashboard', icon: '◈' },
+          { label: 'Редактор',   path: '/editor',    icon: '✦' },
+          { label: 'AI-чат',     path: '/chat',      icon: '◎' },
+          { label: 'Аналитика',  path: '/analytics', icon: '▦' },
+          { label: 'Audit Trail',path: '/audit',     icon: '⊕' },
         ].map(item => (
           <div key={item.path} onClick={() => router.push(item.path)} style={{ display: 'flex', alignItems: 'center', gap: '9px', padding: '8px 9px', borderRadius: '7px', cursor: 'pointer', color: item.path === '/dashboard' ? '#21aaff' : '#8A94A6', background: item.path === '/dashboard' ? 'rgba(33,170,255,0.12)' : 'transparent', marginBottom: '4px', fontSize: '13px', fontWeight: '500' }}>
             <span>{item.icon}</span> {item.label}
           </div>
         ))}
+        {user.role === 'superadmin' && (
+          <div onClick={() => router.push('/admin')} style={{ display: 'flex', alignItems: 'center', gap: '9px', padding: '8px 9px', borderRadius: '7px', cursor: 'pointer', color: '#f97316', background: 'rgba(249,115,22,0.08)', marginTop: '4px', fontSize: '13px', fontWeight: '500' }}>
+            <span>⚙</span> Админка
+          </div>
+        )}
         <div style={{ marginTop: 'auto', padding: '10px 9px', borderTop: '1px solid #1C2640' }}>
           <div style={{ color: '#F0F4FC', fontSize: '12px', fontWeight: '600' }}>{user.name}</div>
           <div style={{ color: '#8A94A6', fontSize: '10px', marginBottom: '8px' }}>{user.email}</div>
@@ -66,10 +86,10 @@ export default function Dashboard() {
         {/* KPI */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '24px' }}>
           {[
-            { val: '0', label: 'AI-запросов', color: '#21aaff' },
-            { val: '0', label: 'Документов', color: '#22c55e' },
-            { val: '100%', label: 'Залогировано', color: '#21aaff' },
-            { val: '0 ₽', label: 'Токенов', color: '#f97316' },
+            { val: kpi.aiRequests, label: 'AI-запросов',  color: '#21aaff' },
+            { val: kpi.documents,  label: 'Документов',   color: '#22c55e' },
+            { val: '100%',         label: 'Залогировано', color: '#21aaff' },
+            { val: kpi.tokens,     label: 'Токенов',      color: '#f97316' },
           ].map((k, i) => (
             <div key={i} style={{ background: '#111827', border: '1px solid #1C2640', borderRadius: '10px', padding: '16px', borderTop: `2px solid ${k.color}` }}>
               <div style={{ fontSize: '28px', fontWeight: '900', color: k.color }}>{k.val}</div>
@@ -78,13 +98,12 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Welcome card */}
+        {/* Status card */}
         <div style={{ background: '#111827', border: '1px solid rgba(33,170,255,0.2)', borderRadius: '12px', padding: '24px' }}>
           <div style={{ color: '#21aaff', fontSize: '13px', fontWeight: '700', marginBottom: '8px' }}>🚀 Система запущена</div>
           <div style={{ color: '#8A94A6', fontSize: '13px', lineHeight: '1.6' }}>
             Бэкенд работает на 85.193.85.81:8000<br/>
             База данных PostgreSQL подключена<br/>
-            Redis запущен<br/>
             Все модули активны
           </div>
         </div>

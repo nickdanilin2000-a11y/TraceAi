@@ -13,8 +13,8 @@ export default function AnalyticsPage() {
     fetch('http://85.193.85.81:8000/audit/stats', {
       headers: { 'Authorization': `Bearer ${token}` }
     })
-    .then(r => r.json())
-    .then(data => { setStats(data); setLoading(false) })
+    .then(r => { if (!r.ok) { if (r.status === 401) router.push('/login'); setLoading(false); return null } return r.json() })
+    .then(data => { if (data) { setStats(data); setLoading(false) } })
     .catch(() => setLoading(false))
   }, [router])
 

@@ -14,8 +14,8 @@ export default function AuditPage() {
     fetch('http://85.193.85.81:8000/audit/', {
       headers: { 'Authorization': `Bearer ${token}` }
     })
-    .then(r => r.json())
-    .then(data => { setLogs(Array.isArray(data) ? data : []); setLoading(false) })
+    .then(r => { if (!r.ok) { if (r.status === 401) router.push('/login'); setLoading(false); return null } return r.json() })
+    .then(data => { if (data) { setLogs(Array.isArray(data) ? data : []); setLoading(false) } })
     .catch(() => setLoading(false))
   }, [router])
 

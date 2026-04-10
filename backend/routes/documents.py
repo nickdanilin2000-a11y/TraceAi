@@ -117,7 +117,7 @@ def update_document(
     
     old_status = doc.status
     
-    if data.title: doc.title = data.title
+    if data.title is not None: doc.title = data.title
     if data.content is not None: doc.content = data.content
     if data.status: doc.status = data.status
 
